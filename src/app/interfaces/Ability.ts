@@ -1,0 +1,3 @@
+interface Ability{
+  name: string;
+}
