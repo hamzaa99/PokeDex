@@ -1,0 +1,9 @@
+<div class="bg-color-red-500">
+  page : {{ page }}
+  <div class="grid grid-cols-1 md:grid-cols-6 gap-1">
+    <div *ngFor="let id of idTable; index as i;" >
+      <app-pokemon-card [pokemonId]= id></app-pokemon-card>
+    </div>
+  </div>
+</div>
+
