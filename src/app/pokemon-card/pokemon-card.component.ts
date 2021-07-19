@@ -41,6 +41,9 @@ export class PokemonCardComponent implements OnInit {
     switch (typeName) {
       case 'grass' : return 'green';
       case 'poison' : return 'purple';
+      case 'water' : return 'blue';
+      case 'fire' : return 'red';
+      case 'bug' : return 'green';
       default : return 'gray';
     }
   }
