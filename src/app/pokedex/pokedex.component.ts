@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute, ParamMap } from '@angular/router';
-
+import {PokemonService} from '../services/pokemon/pokemon.service';
 @Component({
   selector: 'app-pokedex',
   templateUrl: './pokedex.component.html',
@@ -9,69 +8,44 @@ import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 export class PokedexComponent implements OnInit {
 
    page: number | undefined ;
-   previousPage: number | undefined ;
-   nextPage: number | undefined ;
    start: number | undefined ;
    end: number | undefined ;
-   idTable: number[] = [];
+   totalResults: number | undefined;
+   urlTable: any[] = [];
 
-  constructor(private route: ActivatedRoute) {
+  constructor(private pokemonService: PokemonService) {
 
   }
 
   ngOnInit(): void {
-    this.route.params.subscribe( params => this.page = params.page);
-
-    if (this.page){
-      if (this.page > 1 ) {this.previousPage = this.page - 1 ; }
-      if (this.page > 1 ) {this.nextPage =  +this.page + (+1) ; }
-      this.start = ((this.page - 1) * 10) + 1 ;
-      this.end = this.page * 10;
-    }
-    this.setTable();
-
-  }
-
-  public next(): void{
-    if (this.nextPage) {
-      this.start = ((this.nextPage - 1) * 10) + 1 ;
-      this.end = this.nextPage * 10;
-      this.idTable = [];
-      this.setTable();
-      if (this.nextPage > 1 ){
-        this.nextPage --;
-        if ( this.previousPage ) { this.previousPage --; }
-      }
-
-    }
-
-  }
-  public previous(): void{
-    if (this.previousPage) {
-      this.start = ((this.previousPage - 1) * 10) + 1 ;
-      this.end = this.previousPage * 10;
-      this.idTable = [];
-      this.setTable();
-      if (this.previousPage > 1 ){
-        this.previousPage --;
-        if ( this.nextPage ) { this.nextPage --; }
-      }
-
-    }
-
+    this.start = 0;
+    this.getPokemons(this.start, 10);
+    this.page = 1;
   }
   public setTable(): void{
-    if (this.start && this.end){
-      for ( let i = this.start; i <= this.end; i++){
-        this.idTable.push(i);
-      }
+    this.urlTable = [];
+    if (this.page){
+      this.start = ((this.page - 1) * 10) + 1 ;
     }
-    else{
-      for ( let i = 1; i <= 10; i++){
-        this.idTable.push(i);
-      }
+    else { this.start = 0; }
+    this.getPokemons(this.start, 10);
+    console.log(this.urlTable);
+
+  }
+
+  handlePageChange(event: any): void {
+    console.log(this.page);
+    console.log(event);
+    this.page = event;
+    this.setTable();
+  }
+  getPokemons(offset: number, limit: number): void{
+    this.pokemonService.getPokemons(offset, limit).subscribe( res =>
+    {
+      this.totalResults = res.count;
+      this.urlTable = res.results.map((elem: { url: any; }) => elem.url);
     }
-    console.log(this.idTable);
+    );
 
   }
 

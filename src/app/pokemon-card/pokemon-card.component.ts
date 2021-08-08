@@ -10,7 +10,7 @@ import {PokemonService} from '../services/pokemon/pokemon.service';
 })
 export class PokemonCardComponent implements OnInit {
 
-  @Input() pokemonId: number | undefined;
+  @Input() pokemonId: string | undefined;
 
   pokemon: Pokemon = {
     name : '',
@@ -27,6 +27,7 @@ export class PokemonCardComponent implements OnInit {
         this.pokemon.name = res.name;
         this.pokemon.id = res.id;
         // tslint:disable-next-line:no-shadowed-variable
+        // refactor to functional
         for (const element of res.types) {
           this.pokemon.types.push({
             name : element.type.name,
