@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import {PokemonService} from '../services/pokemon/pokemon.service';
+import {map} from 'lodash';
 
 
 
@@ -10,6 +11,8 @@ import {PokemonService} from '../services/pokemon/pokemon.service';
 })
 export class PokemonCardComponent implements OnInit {
 
+  constructor(private pokemonService: PokemonService) { }
+
   @Input() pokemonId: string | undefined;
 
   pokemon: Pokemon = {
@@ -18,27 +21,7 @@ export class PokemonCardComponent implements OnInit {
     types : [],
     pictures : []
   };
-
-  constructor(private pokemonService: PokemonService) { }
-
-  ngOnInit(): void {
-    if (this.pokemonId !== undefined){
-      this.pokemonService.getOnePokemon(this.pokemonId).subscribe(res => {
-        this.pokemon.name = res.name;
-        this.pokemon.id = res.id;
-        // tslint:disable-next-line:no-shadowed-variable
-        // refactor to functional
-        for (const element of res.types) {
-          this.pokemon.types.push({
-            name : element.type.name,
-            id : element.type.url,
-            color : this.pokeTypeColorMap(element.type.name)});
-        }
-        this.pokemon.pictures.push(res.sprites.other.dream_world.front_default);
-      });
-    }
-  }
-  pokeTypeColorMap(typeName: string): string {
+  static pokeTypeColorMap(typeName: string): string {
     switch (typeName) {
       case 'grass' : return 'green';
       case 'poison' : return 'purple';
@@ -47,6 +30,25 @@ export class PokemonCardComponent implements OnInit {
       case 'bug' : return 'green';
       default : return 'gray';
     }
+  }
+
+  ngOnInit(): void {
+    if (this.pokemonId !== undefined){
+      this.pokemonService.getOnePokemon(this.pokemonId).subscribe(res => {
+        this.pokemon.name = res.name;
+        this.pokemon.id = res.id;
+        this.pokemon.types = map(res.types, this.pokeTypeFormat);
+        this.pokemon.pictures.push(res.sprites.other.dream_world.front_default);
+      });
+    }
+  }
+  pokeTypeFormat(pokemonType: any): PokemonType {
+    return {
+      name : pokemonType.type.name,
+      color: PokemonCardComponent.pokeTypeColorMap(pokemonType.type.name),
+      id: pokemonType.type.id
+    };
+
   }
 
 }
